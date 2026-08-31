@@ -4784,7 +4784,7 @@
         <li><a href="#events" class="nav-link magnetic">Competitions</a></li>
         <li><a href="#venue" class="nav-link magnetic">Venues</a></li>
         <li><a href="#contact" class="nav-link magnetic">Contact</a></li>
-        <li><a href="#register" class="nav-link magnetic" style="color: #FBBF24;"><i class="fa-solid fa-ticket"></i> Register</a></li>
+        <li><a href="javascript:void(0)" onclick="openRegisterModal()" class="nav-link magnetic" style="color: #FBBF24;"><i class="fa-solid fa-ticket"></i> Register</a></li>
       </ul>
 
       <div class="nav-actions">
@@ -4793,9 +4793,9 @@
           title="Admin Portal & 11-Squad Scoreboard Control">
           <i class="fa-solid fa-shield-halved"></i> Admin Portal
         </button>
-        <a href="#register" class="btn btn-primary btn-sm magnetic" style="text-decoration: none;">
+        <button type="button" class="btn btn-primary btn-sm magnetic" onclick="openRegisterModal()">
           <i class="fa-solid fa-ticket"></i> Register Now
-        </a>
+        </button>
       </div>
     </div>
   </header>
@@ -4843,9 +4843,9 @@
             <a href="#events" class="btn btn-primary magnetic">
               <i class="fa-solid fa-layer-group"></i> Explore 14 Tracks
             </a>
-            <a href="#register" class="btn btn-outline magnetic">
+            <button type="button" class="btn btn-outline magnetic" onclick="openRegisterModal()">
               <i class="fa-solid fa-signature"></i> Register Team / Solo
-            </a>
+            </button>
           </div>
         </div>
 
@@ -6440,11 +6440,7 @@
       <div class="modal-header">
         <div>
           <span class="event-num-tag" id="modalRuleTag">TRACK 01</span>
-          <h3 class="corporate-title" id="modalRuleCorpTitle" style="margin-top: 6px;">Chief Technology Officer</h3>
-          <span class="real-name-row" style="margin-bottom: 0;">
-            <span class="real-name-label">Real Name:</span>
-            <span class="real-name-val" id="modalRuleRealName">IT Manager</span>
-          </span>
+          <h3 class="corporate-title" id="modalRuleCorpTitle" style="margin-top: 6px; font-size: 22px; font-weight: 700; color: #FFFFFF;">IT Manager</h3>
         </div>
         <button class="modal-close-btn magnetic" onclick="closeRulesModal()">&times;</button>
       </div>
@@ -6513,34 +6509,20 @@
               Select Competition Track *</label>
             <select class="form-control" id="eventSelect" required onchange="handleEventSelectionChange()">
               <option value="" disabled selected>-- Choose an Event Track (14 Available) --</option>
-              <option value="it-quiz" data-size="2">1. IT Quiz (Team of 2 &middot; 1 Round) &middot; Silicon Brainwave
-              </option>
-              <option value="it-manager" data-size="1">2. IT Manager (Individual &middot; 4 Rounds) &middot; Chief
-                Technology Officer</option>
-              <option value="debate" data-size="4">3. Debate (Team of 4 &middot; 2 Rounds) &middot; Boardroom Discourse
-              </option>
-              <option value="startup-pitch" data-size="4">4. Startup Pitch (Team of 4 &middot; 1 Round) &middot; Venture
-                Forge</option>
-              <option value="photography" data-size="1">5. Photography (Individual &middot; Online Drive) &middot;
-                Studio Vanguard</option>
-              <option value="graphical-designing" data-size="1">6. Graphical Designing (Individual &middot; Online
-                Drive) &middot; Pixel Brandscape</option>
-              <option value="coding-debugging" data-size="2">7. Coding and Debugging (Team of 2 &middot; 2 Rounds)
-                &middot; CodeCraft Suite</option>
-              <option value="ipl-auction" data-size="4">8. IPL Auction (Team of 3–4 &middot; Qualifier &amp; Auction)
-                &middot; Franchise Mogul</option>
-              <option value="logo-designing" data-size="1">9. Logo Designing (Individual &middot; Online Drive) &middot;
-                Brand Identity</option>
-              <option value="treasure-hunt" data-size="4">10. Treasure Hunt (Team of 2–4 &middot; 3 Rounds) &middot;
-                Cipher Quest</option>
-              <option value="decode-evidence" data-size="3">11. Decode the Evidence (Team of 2–3 &middot; 2 Rounds)
-                &middot; Cyber Forensics</option>
-              <option value="bgmi" data-size="4">12. BGMI (Team of 4 Squad &middot; 2 Matches) &middot; Apex
-                Battlegrounds</option>
-              <option value="free-fire" data-size="4">13. Free Fire (Team of 4 Squad &middot; 2 Matches) &middot;
-                Survival Clash</option>
-              <option value="typing-marathon" data-size="1">14. Typing Challenge (Individual &middot; 3 Rounds) &middot;
-                Keystroke Velocity</option>
+              <option value="it-quiz" data-size="2">1. IT Quiz (Team of 2)</option>
+              <option value="it-manager" data-size="1">2. IT Manager (Individual)</option>
+              <option value="debate" data-size="4">3. Debate (Team of 4)</option>
+              <option value="startup-pitch" data-size="4">4. Startup Pitch (Team of 4)</option>
+              <option value="photography" data-size="1">5. Photography (Individual &middot; Online Drive)</option>
+              <option value="graphical-designing" data-size="1">6. Graphical Designing (Individual &middot; Online Drive)</option>
+              <option value="coding-debugging" data-size="2">7. Coding and Debugging (Team of 2)</option>
+              <option value="ipl-auction" data-size="4">8. IPL Auction (Team of 3–4)</option>
+              <option value="logo-designing" data-size="1">9. Logo Designing (Individual &middot; Online Drive)</option>
+              <option value="treasure-hunt" data-size="4">10. Treasure Hunt (Team of 2–4)</option>
+              <option value="decode-evidence" data-size="3">11. Decode the Evidence (Team of 2–3)</option>
+              <option value="bgmi" data-size="4">12. BGMI (Team of 4 Squad)</option>
+              <option value="free-fire" data-size="4">13. Free Fire (Team of 4 Squad)</option>
+              <option value="typing-marathon" data-size="1">14. Typing Marathon (Individual)</option>
             </select>
           </div>
 
@@ -6577,19 +6559,27 @@
             <!-- Dynamically populated based on event size -->
           </div>
 
-          <!-- 4. CONTACT DETAILS (Mobile / WhatsApp) -->
-          <div class="form-group">
-            <label class="form-label"><i class="fa-solid fa-phone" style="color: var(--corporate-emerald);"></i> 4.
-              Contact Details (Mobile / WhatsApp) *</label>
-            <input type="tel" class="form-control" id="contactPhone" placeholder="10-digit mobile (e.g. 9876543210)"
-              required pattern="[0-9]{10}">
+          <!-- 4. CONTACT PHONE & 5. EMAIL ADDRESS -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label"><i class="fa-solid fa-phone" style="color: var(--corporate-emerald);"></i> 4.
+                Mobile / WhatsApp *</label>
+              <input type="tel" class="form-control" id="contactPhone" placeholder="10-digit mobile (e.g. 9876543210)"
+                required pattern="[0-9]{10}">
+            </div>
+            <div class="form-group">
+              <label class="form-label"><i class="fa-solid fa-envelope" style="color: var(--corporate-cyan);"></i> 5.
+                Email Address *</label>
+              <input type="email" class="form-control" id="contactEmail" placeholder="e.g. student@claretcollege.edu.in"
+                required>
+            </div>
           </div>
 
-          <!-- 5. YEAR (I, II, III) & 6. CLASS / COURSE -->
+          <!-- 6. YEAR (I, II, III) & 7. CLASS / COURSE -->
           <div class="form-row">
             <div class="form-group">
               <label class="form-label"><i class="fa-solid fa-calendar-days" style="color: var(--corporate-amber);"></i>
-                5. Year *</label>
+                6. Year *</label>
               <select class="form-control" id="studentYear" required>
                 <option value="" disabled selected>-- Select Academic Year --</option>
                 <option value="Year I">Year I</option>
@@ -6599,16 +6589,16 @@
             </div>
             <div class="form-group">
               <label class="form-label"><i class="fa-solid fa-graduation-cap"
-                  style="color: var(--corporate-indigo);"></i> 6. Class / Course *</label>
+                  style="color: var(--corporate-indigo);"></i> 7. Class / Course *</label>
               <input type="text" class="form-control" id="studentCourse" placeholder="e.g. BCA / B.Sc CS" value="BCA"
                 required>
             </div>
           </div>
 
-          <!-- 7. SECTION & 8. ROLL NUMBER -->
+          <!-- 8. SECTION & 9. ROLL NUMBER -->
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label"><i class="fa-solid fa-layer-group" style="color: #F43F5E;"></i> 7. Section
+              <label class="form-label"><i class="fa-solid fa-layer-group" style="color: #F43F5E;"></i> 8. Section
                 *</label>
               <select class="form-control" id="studentSection" required>
                 <option value="" disabled selected>-- Select Section --</option>
@@ -6619,17 +6609,17 @@
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label"><i class="fa-solid fa-id-badge" style="color: var(--corporate-emerald);"></i> 8.
+              <label class="form-label"><i class="fa-solid fa-id-badge" style="color: var(--corporate-emerald);"></i> 9.
                 Roll Number *</label>
               <input type="text" class="form-control" id="studentRollNo" placeholder="ex 24bca001"
                 style="text-transform: uppercase;" required>
             </div>
           </div>
 
-          <div style="margin-top: 26px;">
-            <button type="submit" class="btn btn-primary magnetic"
-              style="width: 100%; padding: 14px; font-size: 15px; font-weight: 700;">
-              <i class="fa-solid fa-check-circle"></i> Confirm & Generate Delegate Pass
+          <div style="margin-top: 24px;">
+            <button type="submit" class="btn btn-primary magnetic" id="regSubmitBtn"
+              style="width: 100%; padding: 15px; font-size: 15.5px; font-weight: 700; box-shadow: 0 8px 25px -4px rgba(99, 102, 241, 0.55); cursor: pointer;">
+              <i class="fa-solid fa-check-circle"></i> Confirm &amp; Generate Delegate Pass
             </button>
           </div>
         </form>
@@ -7911,11 +7901,7 @@
               </span>
             </div>
 
-            <h3 class="corporate-title">${event.corpTitle}</h3>
-            <div class="real-name-row">
-              <span class="real-name-label">Track:</span>
-              <span class="real-name-val">${event.realName}</span>
-            </div>
+            <h3 class="corporate-title" style="font-size: 21px; font-weight: 700; color: #FFFFFF; margin-top: 4px; margin-bottom: 12px; letter-spacing: -0.01em;">${event.realName}</h3>
 
             <!-- Quick Meta Badge Row: Time & Venue -->
             <div class="event-card-quick-meta">
@@ -7984,8 +7970,7 @@
       if (!event) return;
 
       document.getElementById('modalRuleTag').textContent = event.num;
-      document.getElementById('modalRuleCorpTitle').textContent = event.corpTitle;
-      document.getElementById('modalRuleRealName').textContent = event.realName;
+      document.getElementById('modalRuleCorpTitle').textContent = event.realName;
 
       const formatEl = document.getElementById('modalRuleFormat');
       formatEl.innerHTML = `<i class="fa-solid ${event.formatType === 'solo' ? 'fa-user' : 'fa-users'}"></i> Format: ${event.format}`;
@@ -8172,11 +8157,12 @@
       const teamDisplayName = subAlias ? `${squadName} · ${subAlias}` : squadName;
 
       // Extract form fields
-      const phone = document.getElementById('contactPhone').value;
+      const phone = document.getElementById('contactPhone').value.trim();
+      const email = document.getElementById('contactEmail') ? document.getElementById('contactEmail').value.trim() : '';
       const year = document.getElementById('studentYear').value;
-      const course = document.getElementById('studentCourse').value;
+      const course = document.getElementById('studentCourse').value.trim();
       const section = document.getElementById('studentSection').value;
-      const rollNo = document.getElementById('studentRollNo').value.toUpperCase();
+      const rollNo = document.getElementById('studentRollNo').value.toUpperCase().trim();
 
       // Collect all participant names
       const participantNames = [];
@@ -8198,6 +8184,7 @@
         teamName: teamDisplayName,
         participants: participantNames.join(", "),
         phone: phone,
+        email: email,
         year: year,
         course: course,
         section: section,
@@ -8240,12 +8227,13 @@
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; font-size: 13px; font-family: var(--font-mono);">
           <div><span style="color: var(--text-muted);">Assigned Squad:</span> <strong style="color: #34D399;">${squadName}</strong></div>
           <div><span style="color: var(--text-muted);">Roll Number:</span> <strong style="color: #FBBF24;">${rollNo}</strong></div>
+          <div><span style="color: var(--text-muted);">Email ID:</span> <strong style="color: #60A5FA;">${email || 'N/A'}</strong></div>
+          <div><span style="color: var(--text-muted);">Contact Phone:</span> <strong style="color: #FFFFFF;">${phone}</strong></div>
           <div><span style="color: var(--text-muted);">Year:</span> <strong style="color: #FFFFFF;">${year}</strong></div>
           <div><span style="color: var(--text-muted);">Class / Course:</span> <strong style="color: #FFFFFF;">${course}</strong></div>
           <div><span style="color: var(--text-muted);">Section:</span> <strong style="color: #FFFFFF;">${section}</strong></div>
           <div><span style="color: var(--text-muted);">Venue:</span> <strong style="color: #67E8F9;">${trackVenue}</strong></div>
-          <div><span style="color: var(--text-muted);">Timing:</span> <strong style="color: #FCD34D;">${trackTime}</strong></div>
-          <div><span style="color: var(--text-muted);">Contact Phone:</span> <strong style="color: #FFFFFF;">${phone}</strong></div>
+          <div style="grid-column: 1/-1;"><span style="color: var(--text-muted);">Timing:</span> <strong style="color: #FCD34D;">${trackTime}</strong></div>
         </div>
         ${participantNames.length > 0 ? `
           <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 12.5px; color: #CBD5E1;">
