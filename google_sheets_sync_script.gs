@@ -40,6 +40,7 @@ function doPost(e) {
         "Sub-Squad / Duo Alias",
         "Participant Name(s)",
         "Mobile / WhatsApp",
+        "Email Address",
         "Academic Year",
         "Class / Course",
         "Section",
@@ -77,6 +78,7 @@ function doPost(e) {
     var participantNames = data.participants || data.name || "Participant";
     var eventName = data.event || data.Event || "Inspire 2026 Event";
     var phone = data.phone || data.Phone || "N/A";
+    var email = data.email || data.Email || "N/A";
     var year = data.year || data.Year || "N/A";
     var course = data.course || data.Course || "N/A";
     var section = data.section || data.Section || "N/A";
@@ -94,6 +96,7 @@ function doPost(e) {
       teamOrAlias,
       participantNames,
       phone,
+      email,
       year,
       course,
       section,
