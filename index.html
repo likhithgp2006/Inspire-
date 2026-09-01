@@ -2450,9 +2450,12 @@
       left: 0;
       width: 100% !important;
       max-width: 100vw !important;
-      height: 100vh;
+      height: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
       background: rgba(3, 7, 18, 0.85);
       backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       z-index: 2000;
       display: none;
       align-items: center;
@@ -2461,6 +2464,9 @@
       opacity: 0;
       transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       overflow-x: hidden !important;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
     }
 
     .modal-overlay.active {
@@ -2475,7 +2481,10 @@
       max-width: 680px;
       width: 100%;
       max-height: 90vh;
-      overflow-y: auto;
+      max-height: calc(100dvh - 32px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
       box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(16, 185, 129, 0.15);
       position: relative;
       animation: modalSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1);
@@ -2494,15 +2503,14 @@
     }
 
     .modal-header {
-      padding: 28px 32px 20px;
+      padding: 24px 28px 18px;
       border-bottom: 1px solid var(--border-subtle);
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      position: sticky;
-      top: 0;
       background: #0F172A;
       z-index: 10;
+      flex-shrink: 0;
     }
 
     .modal-close-btn {
@@ -2527,7 +2535,24 @@
     }
 
     .modal-body {
-      padding: 32px;
+      padding: 28px 32px 32px;
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+
+    /* Modal Sticky / Permanently Visible Submit Bar */
+    .modal-submit-sticky {
+      position: sticky;
+      bottom: -1px;
+      margin-top: 24px;
+      padding: 14px 0 calc(12px + env(safe-area-inset-bottom, 8px));
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.75) 0%, rgba(15, 23, 42, 0.98) 40%, #0F172A 100%);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 25;
     }
 
     .rules-list {
@@ -3015,20 +3040,49 @@
         gap: 10px;
       }
 
+      .modal-overlay {
+        padding: 8px 6px calc(14px + env(safe-area-inset-bottom, 12px)) !important;
+        align-items: flex-start !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+
       .modal-container {
-        width: 96% !important;
-        max-width: 96% !important;
-        margin: 10px auto !important;
-        max-height: 94vh;
-        border-radius: var(--radius-md) !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: auto 0 !important;
+        max-height: calc(100dvh - 16px) !important;
+        border-radius: var(--radius-lg) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
       }
 
       .modal-header {
-        padding: 18px 18px 12px !important;
+        padding: 16px 18px 12px !important;
+        flex-shrink: 0 !important;
       }
 
       .modal-body {
-        padding: 18px 16px !important;
+        padding: 16px 14px calc(24px + env(safe-area-inset-bottom, 16px)) !important;
+        flex: 1 !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+
+      .modal-submit-sticky {
+        margin-top: 18px !important;
+        padding: 12px 0 calc(10px + env(safe-area-inset-bottom, 6px)) !important;
+        position: sticky !important;
+        bottom: -1px !important;
+      }
+
+      .modal-submit-sticky .btn,
+      #regSubmitBtn {
+        min-height: 52px !important;
+        font-size: 15px !important;
+        font-weight: 700 !important;
+        box-shadow: 0 8px 25px -4px rgba(99, 102, 241, 0.65) !important;
       }
 
       .pass-container {
@@ -6472,11 +6526,11 @@
           <i class="fa-solid fa-gavel"></i> The decision of the judges and organizers will be final and binding.
         </div>
 
-        <div style="margin-top: 28px; display: flex; gap: 12px;">
-          <button class="btn btn-primary magnetic" id="modalRegisterBtn" style="flex: 1;">
+        <div class="modal-submit-sticky" style="display: flex; gap: 12px;">
+          <button class="btn btn-primary magnetic" id="modalRegisterBtn" style="flex: 1; justify-content: center; min-height: 48px;">
             <i class="fa-solid fa-file-signature"></i> Register for this Track
           </button>
-          <button class="btn btn-outline magnetic" onclick="closeRulesModal()">Close</button>
+          <button class="btn btn-outline magnetic" onclick="closeRulesModal()" style="min-height: 48px;">Close</button>
         </div>
       </div>
     </div>
@@ -6616,9 +6670,9 @@
             </div>
           </div>
 
-          <div style="margin-top: 24px;">
+          <div class="modal-submit-sticky">
             <button type="submit" class="btn btn-primary magnetic" id="regSubmitBtn"
-              style="width: 100%; padding: 15px; font-size: 15.5px; font-weight: 700; box-shadow: 0 8px 25px -4px rgba(99, 102, 241, 0.55); cursor: pointer;">
+              style="width: 100%; min-height: 52px; padding: 14px 20px; font-size: 15.5px; font-weight: 700; box-shadow: 0 8px 25px -4px rgba(99, 102, 241, 0.55); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
               <i class="fa-solid fa-check-circle"></i> Confirm &amp; Generate Delegate Pass
             </button>
           </div>
@@ -6718,11 +6772,11 @@
             <span id="modalAdminErrorText">Incorrect Password. Try again.</span>
           </div>
 
-          <div style="display: flex; gap: 12px; margin-top: 10px;">
-            <button type="submit" class="btn btn-primary magnetic" style="flex: 1; justify-content: center;">
+          <div class="modal-submit-sticky" style="display: flex; gap: 12px; margin-top: 14px;">
+            <button type="submit" class="btn btn-primary magnetic" style="flex: 1; justify-content: center; min-height: 48px;">
               <i class="fa-solid fa-arrow-right-to-bracket"></i> Unlock &amp; Enter
             </button>
-            <button type="button" class="btn btn-outline magnetic" onclick="closeAdminAuthModal()">Cancel</button>
+            <button type="button" class="btn btn-outline magnetic" onclick="closeAdminAuthModal()" style="min-height: 48px;">Cancel</button>
           </div>
         </form>
       </div>
