@@ -105,6 +105,12 @@
       justify-content: center;
       padding: 20px;
       transition: opacity 0.4s ease, visibility 0.4s ease;
+      height: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
     }
 
     #login-overlay.hidden {
@@ -1305,6 +1311,12 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
+      height: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
     }
 
     .modal-backdrop.active {
@@ -1365,6 +1377,128 @@
     #toast-notification.show {
       transform: translateY(0);
       opacity: 1;
+    }
+
+    /* =============================================================
+       MOBILE & RESPONSIVE CONSOLE RULES
+       ============================================================= */
+    @media (max-width: 992px) {
+      .dashboard-container {
+        padding: 20px 16px calc(24px + env(safe-area-inset-bottom, 16px));
+      }
+
+      .dashboard-topbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+
+      .topbar-actions {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      #login-overlay {
+        align-items: flex-start !important;
+        padding: 16px 12px calc(24px + env(safe-area-inset-bottom, 16px)) !important;
+      }
+
+      .login-card {
+        padding: 26px 20px !important;
+        margin: auto 0 !important;
+        max-width: 100% !important;
+        border-radius: var(--radius-lg) !important;
+      }
+
+      .login-btn {
+        min-height: 50px !important;
+        font-size: 15px !important;
+        font-weight: 700 !important;
+        margin-top: 14px !important;
+      }
+
+      .modal-backdrop {
+        align-items: flex-start !important;
+        padding: 12px 10px calc(24px + env(safe-area-inset-bottom, 16px)) !important;
+      }
+
+      .modal-dialog {
+        padding: 22px 18px !important;
+        margin: auto 0 !important;
+        max-height: calc(100dvh - 24px) !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        border-radius: var(--radius-lg) !important;
+      }
+
+      .podium-row {
+        grid-template-columns: 1fr !important;
+        gap: 8px !important;
+      }
+
+      .podium-tag {
+        width: 100% !important;
+        justify-content: flex-start !important;
+        padding: 8px 12px !important;
+      }
+
+      .btn-award-all {
+        width: 100% !important;
+        min-height: 52px !important;
+        font-size: 14.5px !important;
+        font-weight: 700 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        padding: 14px 18px !important;
+      }
+
+      .bulk-preset-points-row {
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+      }
+
+      .bulk-teams-chips-grid {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+        gap: 8px !important;
+      }
+
+      .team-row-card {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+        padding: 14px 16px !important;
+      }
+
+      .team-quick-actions {
+        width: 100% !important;
+        justify-content: flex-start !important;
+        flex-wrap: wrap !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .login-title {
+        font-size: 22px !important;
+      }
+
+      .login-desc {
+        font-size: 12.5px !important;
+      }
+
+      .content-card {
+        padding: 16px 14px !important;
+      }
+
+      .btn-action {
+        padding: 8px 12px !important;
+        font-size: 12px !important;
+      }
     }
   </style>
 </head>
