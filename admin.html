@@ -1578,10 +1578,14 @@
       </div>
 
       <div class="admin-header-actions">
-        <div class="status-badge">
+        <div class="status-badge" id="cloudStatusBadge">
           <div class="status-dot"></div>
-          <span id="syncStatusText">BROADCAST SYNC ACTIVE</span>
+          <span id="syncStatusText">CLOUD SYNC ACTIVE</span>
         </div>
+
+        <button class="btn-action btn-action-outline" onclick="forceCloudSync()" title="Push latest scores to all devices via Google Cloud">
+          <i class="fa-solid fa-cloud-arrow-up"></i> <span>Sync Cloud</span>
+        </button>
 
         <button class="btn-action btn-action-outline" onclick="toggleSoundFx()" id="soundToggleBtn"
           title="Toggle UI Synthesizer Sound FX">
@@ -2149,6 +2153,9 @@
     const LS_KEY_CREDS = "inspire_2026_admin_credentials";
     const LS_KEY_SOUND = "inspire_2026_sound_enabled";
 
+    // Google Sheets & Cloud Sync Endpoint for Cross-Device Synchronization
+    const GOOGLE_SHEETS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxRGYUj04rvaQeBA9iAk878Upr6Xd8AQB9a9vwiRsItySnhxJ0Tv54C5lnAVd9r388pCg/exec";
+
     // BroadcastChannel for instant cross-tab live synchronization
     const syncChannel = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel('inspire_2026_sync') : null;
 
@@ -2156,6 +2163,96 @@
     let teamsData = [];
     let auditLogs = [];
     let soundEnabled = true;
+    let isCloudPushing = false;
+    let lastCloudSyncTime = null;
+
+    // -------------------------------------------------------------
+    // REAL-TIME CLOUD DATABASE SYNCHRONIZATION
+    // -------------------------------------------------------------
+    async function syncScoresToCloud() {
+      if (!GOOGLE_SHEETS_WEB_APP_URL || !GOOGLE_SHEETS_WEB_APP_URL.trim().startsWith("http")) return;
+
+      const statusText = document.getElementById('syncStatusText');
+      if (statusText) {
+        statusText.textContent = "SYNCING TO CLOUD...";
+        statusText.style.color = "#FBBF24";
+      }
+
+      try {
+        isCloudPushing = true;
+        const payload = {
+          action: "update_scores",
+          teams: teamsData,
+          auditLogs: auditLogs.slice(0, 50),
+          timestamp: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
+        };
+
+        await fetch(GOOGLE_SHEETS_WEB_APP_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        lastCloudSyncTime = new Date();
+        if (statusText) {
+          statusText.textContent = "CLOUD SYNC LIVE (ALL DEVICES)";
+          statusText.style.color = "#34D399";
+        }
+      } catch (err) {
+        console.warn("Cloud sync warning:", err);
+        if (statusText) {
+          statusText.textContent = "LOCAL SAVED · SYNC PENDING";
+          statusText.style.color = "#F87171";
+        }
+      } finally {
+        isCloudPushing = false;
+      }
+    }
+
+    async function fetchScoresFromCloud(silent = false) {
+      if (!GOOGLE_SHEETS_WEB_APP_URL || !GOOGLE_SHEETS_WEB_APP_URL.trim().startsWith("http")) return;
+      if (isCloudPushing) return;
+
+      try {
+        const res = await fetch(GOOGLE_SHEETS_WEB_APP_URL + "?action=get_scores&t=" + Date.now());
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.status === "success" && Array.isArray(data.teams) && data.teams.length > 0) {
+            let hasChanges = false;
+            data.teams.forEach(remoteTeam => {
+              const local = teamsData.find(t => t.id === remoteTeam.id || t.num === remoteTeam.num);
+              if (local && local.points !== remoteTeam.points) {
+                local.points = remoteTeam.points;
+                hasChanges = true;
+              }
+            });
+
+            if (hasChanges) {
+              localStorage.setItem(LS_KEY_TEAMS, JSON.stringify(teamsData));
+              if (data.auditLogs && Array.isArray(data.auditLogs) && data.auditLogs.length > 0) {
+                auditLogs = data.auditLogs;
+                saveAuditLogs();
+                renderAuditLogs();
+              }
+              renderLeaderboard();
+              populateEventScorerDropdowns();
+              if (!silent) showToast("Live scores updated from cloud!");
+            }
+          }
+        }
+      } catch (err) {
+        // Silent fallback
+      }
+    }
+
+    function forceCloudSync() {
+      playSynthSound('click');
+      showToast("Broadcasting live scores to all student devices & Google Sheets...");
+      syncScoresToCloud();
+    }
 
     // -------------------------------------------------------------
     // 2. AUDIO SYNTHESIZER FEEDBACK (Web Audio API)
@@ -2407,6 +2504,9 @@
       localStorage.setItem(LS_KEY_TEAMS, JSON.stringify(teamsData));
       if (broadcast && syncChannel) {
         syncChannel.postMessage({ type: 'TEAMS_UPDATE', data: teamsData });
+      }
+      if (broadcast) {
+        syncScoresToCloud();
       }
     }
 
@@ -2953,6 +3053,12 @@
       populateBulkTeamsCheckboxes();
       renderLeaderboard();
       renderAuditLogs();
+
+      // Immediately fetch latest live scores from Google Cloud
+      fetchScoresFromCloud(true);
+
+      // Auto-sync polling every 8 seconds for multi-admin devices
+      setInterval(() => fetchScoresFromCloud(true), 8000);
     });
   </script>
 </body>
