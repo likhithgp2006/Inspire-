@@ -5079,10 +5079,17 @@
             <p style="font-size: 13px; color: var(--text-muted); margin: 0;">Rankings automatically sort based on
               cumulative track points.</p>
           </div>
-          <span
-            style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); background: rgba(255,255,255,0.04); padding: 5px 14px; border-radius: 6px; border: 1px solid var(--border-subtle);">
-            <i class="fa-solid fa-shield-halved" style="color: #6366F1;"></i> 11 Registered Squads
-          </span>
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <span id="liveSyncBadge"
+              style="font-family: var(--font-mono); font-size: 11.5px; color: #34D399; background: rgba(16, 185, 129, 0.1); padding: 5px 12px; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.25); display: inline-flex; align-items: center; gap: 6px;">
+              <span style="width: 7px; height: 7px; border-radius: 50%; background: #10B981; box-shadow: 0 0 8px #10B981; display: inline-block;"></span>
+              LIVE CLOUD SYNC
+            </span>
+            <span
+              style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); background: rgba(255,255,255,0.04); padding: 5px 14px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+              <i class="fa-solid fa-shield-halved" style="color: #6366F1;"></i> 11 Registered Squads
+            </span>
+          </div>
         </div>
 
         <div class="pub-leaderboard-list" id="publicLeaderboardList">
@@ -8482,11 +8489,13 @@
     ];
 
     function getLiveTeamsData() {
-      // Lookup map of original pristine team data
+      // Robust lookup map of original pristine team data
       const defaultMap = {};
       PUBLIC_TEAMS_DATA.forEach(t => {
-        defaultMap[t.id] = t;
-        defaultMap[t.num] = t;
+        defaultMap[t.id.toLowerCase()] = t;
+        defaultMap[t.id.replace(/[-_]/g, '').toLowerCase()] = t;
+        defaultMap[t.num.replace(/[\s-_]/g, '').toLowerCase()] = t;
+        defaultMap[t.name.toLowerCase()] = t;
       });
 
       const stored = localStorage.getItem("inspire_2026_teams_leaderboard");
@@ -8495,9 +8504,13 @@
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed) && parsed.length > 0) {
             parsed.forEach(t => {
-              const def = defaultMap[t.id] || defaultMap[t.num];
+              const key1 = (t.id || '').toLowerCase();
+              const key2 = (t.id || '').replace(/[-_]/g, '').toLowerCase();
+              const key3 = (t.num || '').replace(/[\s-_]/g, '').toLowerCase();
+              const key4 = (t.name || '').toLowerCase();
+              const def = defaultMap[key1] || defaultMap[key2] || defaultMap[key3] || defaultMap[key4];
               if (def) {
-                // Ensure Captain & Vice Captain photos are always correct and point to root files
+                // Ensure Captain & Vice Captain photos and metadata are always correct
                 t.captainImg = def.captainImg;
                 t.viceCaptainImg = def.viceCaptainImg;
                 t.captain = def.captain;
@@ -8506,8 +8519,8 @@
                 t.accent2 = def.accent2;
                 t.name = def.name;
                 t.num = def.num;
+                t.id = def.id;
               } else {
-                // Strip legacy 'images/' prefix if any
                 if (t.captainImg) t.captainImg = t.captainImg.replace(/^images\//, '');
                 if (t.viceCaptainImg) t.viceCaptainImg = t.viceCaptainImg.replace(/^images\//, '');
               }
@@ -8652,12 +8665,94 @@
     }
 
     // -------------------------------------------------------------
-    // REAL-TIME SYNCHRONIZATION WITH ADMIN PORTAL
+    // REAL-TIME CLOUD SCORES SYNCHRONIZATION (CROSS-DEVICE SYNC)
     // -------------------------------------------------------------
+    let isFetchingCloudScores = false;
+
+    async function fetchLiveCloudScores() {
+      if (!GOOGLE_SHEETS_WEB_APP_URL || !GOOGLE_SHEETS_WEB_APP_URL.trim().startsWith("http")) return;
+      if (isFetchingCloudScores) return;
+
+      try {
+        isFetchingCloudScores = true;
+        const res = await fetch(GOOGLE_SHEETS_WEB_APP_URL + "?action=get_scores&t=" + Date.now());
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.status === "success" && Array.isArray(data.teams) && data.teams.length > 0) {
+            const defaultMap = {};
+            PUBLIC_TEAMS_DATA.forEach(t => {
+              defaultMap[t.id.toLowerCase()] = t;
+              defaultMap[t.id.replace(/[-_]/g, '').toLowerCase()] = t;
+              defaultMap[t.num.replace(/[\s-_]/g, '').toLowerCase()] = t;
+              defaultMap[t.name.toLowerCase()] = t;
+            });
+
+            // Update in-memory PUBLIC_TEAMS_DATA points
+            data.teams.forEach(remote => {
+              const key1 = (remote.id || '').toLowerCase();
+              const key2 = (remote.id || '').replace(/[-_]/g, '').toLowerCase();
+              const key3 = (remote.num || '').replace(/[\s-_]/g, '').toLowerCase();
+              const key4 = (remote.name || '').toLowerCase();
+              const local = defaultMap[key1] || defaultMap[key2] || defaultMap[key3] || defaultMap[key4];
+              if (local) {
+                local.points = Number(remote.points) || 0;
+              }
+            });
+
+            // Save to localStorage for instant startup on next visit
+            localStorage.setItem("inspire_2026_teams_leaderboard", JSON.stringify(PUBLIC_TEAMS_DATA));
+
+            // Re-render public leaderboard & podium
+            renderPublicLeaderboard();
+
+            const badge = document.getElementById('liveSyncBadge');
+            if (badge) {
+              badge.innerHTML = '<span style="width: 7px; height: 7px; border-radius: 50%; background: #10B981; box-shadow: 0 0 8px #10B981; display: inline-block;"></span> LIVE CLOUD SYNC';
+              badge.style.color = "#34D399";
+            }
+          }
+        }
+      } catch (err) {
+        // Gracefully use local cache
+      } finally {
+        isFetchingCloudScores = false;
+      }
+    }
+
+    // Immediate initial sync from Google Cloud
+    fetchLiveCloudScores();
+
+    // Auto-poll Google Cloud every 5 seconds so all student phones & spectator devices stay synchronized
+    setInterval(fetchLiveCloudScores, 5000);
+
+    // Refresh immediately when user brings the website tab into view
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        fetchLiveCloudScores();
+      }
+    });
+
     if (typeof BroadcastChannel !== 'undefined') {
       const syncChannel = new BroadcastChannel('inspire_2026_sync');
       syncChannel.onmessage = (e) => {
         if (e.data && e.data.type === 'TEAMS_UPDATE') {
+          if (Array.isArray(e.data.data)) {
+            const defaultMap = {};
+            PUBLIC_TEAMS_DATA.forEach(t => {
+              defaultMap[t.id.toLowerCase()] = t;
+              defaultMap[t.id.replace(/[-_]/g, '').toLowerCase()] = t;
+              defaultMap[t.num.replace(/[\s-_]/g, '').toLowerCase()] = t;
+              defaultMap[t.name.toLowerCase()] = t;
+            });
+            e.data.data.forEach(remote => {
+              const key1 = (remote.id || '').toLowerCase();
+              const key2 = (remote.id || '').replace(/[-_]/g, '').toLowerCase();
+              const key3 = (remote.num || '').replace(/[\s-_]/g, '').toLowerCase();
+              const key4 = (remote.name || '').toLowerCase();
+              const local = defaultMap[key1] || defaultMap[key2] || defaultMap[key3] || defaultMap[key4];
+              if (local) local.points = Number(remote.points) || 0;
+            });
+          }
           renderPublicLeaderboard();
         }
       };
